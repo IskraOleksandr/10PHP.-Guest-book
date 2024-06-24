@@ -1,7 +1,9 @@
 <?php
-
-require 'config.php';
-global $pdo;
+try {
+    $pdo = new PDO("mysql:host=localhost;dbname=guestbook_db", 'root', '');
+} catch (PDOException $e) {
+    die("Could not connect to the database guestbook_db :" . $e->getMessage());
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_msg'])) {
     $id_msg = $_POST['id_msg'];
     $answer = $_POST['answer'];
@@ -18,13 +20,14 @@ $messages = $stmt->fetchAll();
 <html>
 <head>
     <title>Гостевая книга - Администрирование</title>
+    <link rel="stylesheet" type="text/css" href="Style.css">
 </head>
 <body>
+<div class="container">
 <h1>Администрирование</h1>
-<a href="index.php">Вернуться на главную</a>
 <hr>
 <?php foreach ($messages as $message): ?>
-    <div>
+    <div class="message">
         <h3><?php echo htmlspecialchars($message['name']); ?> из <?php echo htmlspecialchars($message['city']); ?></h3>
         <p><?php echo nl2br(htmlspecialchars($message['msg'])); ?></p>
         <form action="admin.php" method="POST">
@@ -34,12 +37,13 @@ $messages = $stmt->fetchAll();
             <select name="hide">
                 <option value="show" <?php if ($message['hide'] == 'show') echo 'selected'; ?>>Да</option>
                 <option value="hide" <?php if ($message['hide'] == 'hide') echo 'selected'; ?>>Нет</option>
-            </select><br>
+            </select><br><br>
             <input type="submit" value="Сохранить">
         </form>
         <small>Добавлено: <?php echo $message['puttime']; ?></small>
     </div>
     <hr>
 <?php endforeach; ?>
+</div>
 </body>
 </html>
